@@ -9,6 +9,16 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('qt.ui', self)  # Загружаем дизайн
+        self.btnOpen.clicked.connect(self.open)
+        self.btnSave.clicked.connect(self.save)
+
+
+    def open(self):
+        print('Clicked "Open"')
+
+
+    def save(self):
+        print('Clicked "Save"')
 
 
 def except_hook(cls, exception, traceback):
