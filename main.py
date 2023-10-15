@@ -7,17 +7,22 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QTableWidgetItem
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.file = ""
         uic.loadUi('qt.ui', self)  # Загружаем дизайн
         self.btnOpen.clicked.connect(self.open)
         self.btnSave.clicked.connect(self.save)
 
     def open(self):
         self.file = QFileDialog.getOpenFileName(self, 'Выбрать файл', '')[0]
-        print(self.file)
+        self.f = open(self.file, "r+")
+        self.textEdit.setPlainText(self.f.read())
 
     def save(self):
-        print('Clicked "Save"')
+        self.f.close()
+        self.f = open(self.file, "w")
+        self.f.write(self.textEdit.toPlainText())
+        self.f.close()
+        self.f = open(self.file, "r+")
+        self.textEdit.setPlainText(self.f.read())
 
 
 def except_hook(cls, exception, traceback):
