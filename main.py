@@ -10,19 +10,37 @@ class MainWindow(QWidget):
         uic.loadUi('qt.ui', self)  # Загружаем дизайн
         self.btnOpen.clicked.connect(self.open)
         self.btnSave.clicked.connect(self.save)
+        self.file = "temp"
+        self.f = open(self.file, "w")
 
     def open(self):
-        self.file = QFileDialog.getOpenFileName(self, 'Выбрать файл', '')[0]
-        self.f = open(self.file, "r+")
-        self.textEdit.setPlainText(self.f.read())
+        try:
+            self.file = QFileDialog.getOpenFileName(self, 'Выбрать файл', '',
+                                                    'Текстовый файл (*.txt);;')[0]
+            self.f = open(self.file, "r+")
+            self.textEdit.setPlainText(self.f.read())
+        except UnicodeDecodeError:
+            self.status.setText("Ошибка декодирования (UnicodeDecodeError)")
+        except Exception:
+            self.status.setText("Неизвестная ошибка")
 
     def save(self):
-        self.f.close()
-        self.f = open(self.file, "w")
-        self.f.write(self.textEdit.toPlainText())
-        self.f.close()
-        self.f = open(self.file, "r+")
-        self.textEdit.setPlainText(self.f.read())
+        if self.file != "temp":
+            self.f.close()
+            self.f = open(self.file, "w")
+            self.f.write(self.textEdit.toPlainText())
+            self.f.close()
+            self.f = open(self.file, "r+")
+            self.textEdit.setPlainText(self.f.read())
+        else:
+            self.file = QFileDialog.getOpenFileName(self, 'Выбрать файл', '',
+                                                    'Текстовый файл (*.txt);;')[0]
+            self.f.close()
+            self.f = open(self.file, "w")
+            self.f.write(self.textEdit.toPlainText())
+            self.f.close()
+            self.f = open(self.file, "r+")
+            self.textEdit.setPlainText(self.f.read())
 
 
 def except_hook(cls, exception, traceback):
