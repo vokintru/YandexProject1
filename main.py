@@ -8,9 +8,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('qt.ui', self) # Загружаем дизайн
-
-
+        uic.loadUi('qt.ui', self)  # Загружаем дизайн
 
 
 def except_hook(cls, exception, traceback):
