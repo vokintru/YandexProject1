@@ -1,5 +1,5 @@
+# Импорт библеотек
 import sqlite3
-
 from PyQt5.QtWidgets import QWidget, QApplication, QListWidgetItem, QMessageBox
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
@@ -9,14 +9,14 @@ import sys
 class Window(QWidget):
     def __init__(self):
         super(Window, self).__init__()
-        self.setupUi(self)
+        self.setupUi(self)  # Подключение дизайна
+        # Подключения
         self.calendarWidget.selectionChanged.connect(self.calendarDateChanged)
         self.calendarDateChanged()
         self.saveButton.clicked.connect(self.saveChanges)
         self.addButton.clicked.connect(self.addNewTask)
 
-
-    def setupUi(self, Form):
+    def setupUi(self, Form):  # Дизайн
         Form.setObjectName("Form")
         Form.resize(852, 426)
         self.calendarWidget = QtWidgets.QCalendarWidget(Form)
@@ -43,28 +43,28 @@ class Window(QWidget):
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, Form):  # Дизайн
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.saveButton.setText(_translate("Form", "Save Changes"))
         self.addButton.setText(_translate("Form", "Add new"))
 
-    def calendarDateChanged(self):
-        print("The calendar date was changed.")
+    def calendarDateChanged(self):  # Отслеживает изменения даты
         dateSelected = self.calendarWidget.selectedDate().toPyDate()
-        print("Date selected:", dateSelected)
         self.updateTaskList(dateSelected)
 
-    def updateTaskList(self, date):
-        self.tasksListWidget.clear()
+    def updateTaskList(self, date):  # Запись в базу данных
+        self.tasksListWidget.clear()  # Отчистка списка задач
 
+        # Подключаемся к базе
         db = sqlite3.connect("data.db")
         cursor = db.cursor()
 
+        # Делаем запрос и обрабатываем его
         query = "SELECT task, completed FROM tasks WHERE date = ?"
         row = (date,)
         results = cursor.execute(query, row).fetchall()
-        for result in results:
+        for result in results:  # Добавление задач в список
             item = QListWidgetItem(str(result[0]))
             item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable)
             if result[1] == "YES":
@@ -73,13 +73,13 @@ class Window(QWidget):
                 item.setCheckState(QtCore.Qt.Unchecked)
             self.tasksListWidget.addItem(item)
 
-
-    def saveChanges(self):
+    def saveChanges(self):  # Сохранение отметок
+        # Подключаемся к базе
         db = sqlite3.connect("data.db")
         cursor = db.cursor()
-        date = self.calendarWidget.selectedDate().toPyDate()
+        date = self.calendarWidget.selectedDate().toPyDate()  # Дата для сохранения
 
-        for i in range(self.tasksListWidget.count()):
+        for i in range(self.tasksListWidget.count()):  # Запись в БД
             item = self.tasksListWidget.item(i)
             task = item.text()
             if item.checkState() == QtCore.Qt.Checked:
@@ -88,32 +88,37 @@ class Window(QWidget):
                 query = "UPDATE tasks SET completed = 'NO' WHERE task = ? AND date = ?"
             row = (task, date,)
             cursor.execute(query, row)
-        db.commit()
+        db.commit()  # Сохранение изменений в БД
 
         messageBox = QMessageBox()
-        messageBox.setText("Changes saved.")
+        messageBox.setText("Сохранено.")
         messageBox.setStandardButtons(QMessageBox.Ok)
         messageBox.exec()
 
-    def addNewTask(self):
+    def addNewTask(self):  # Добавление новой задачи
+        # Подключаемся к базе
         db = sqlite3.connect("data.db")
         cursor = db.cursor()
 
+        # Сохраняем задачу и дату
         newTask = str(self.taskLineEdit.text())
         date = self.calendarWidget.selectedDate().toPyDate()
 
+        # Создаём запрос
         query = "INSERT INTO tasks(task, completed, date) VALUES (?,?,?)"
         row = (newTask, "NO", date,)
 
+        # Сорханяем
         cursor.execute(query, row)
         db.commit()
+
+        # Выводим изменения
         self.updateTaskList(date)
         self.taskLineEdit.clear()
 
+
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
-
 
 
 if __name__ == "__main__":
