@@ -1,8 +1,8 @@
 # Импорт библеотек
 import sqlite3
 from PyQt5.QtWidgets import QWidget, QApplication, QListWidgetItem, QMessageBox
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.uic import loadUi
-from PyQt5 import QtCore
 import sys
 
 
