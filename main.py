@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QListWidgetItem, QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.uic import loadUi
 import sys
+import os
 
 
 class Window(QWidget):
@@ -54,11 +55,11 @@ class Window(QWidget):
         self.updateTaskList(dateSelected)
 
     def updateTaskList(self, date):  # Запись в базу данных
-        self.tasksListWidget.clear()  # Отчистка списка задач
-
         # Подключаемся к базе
         db = sqlite3.connect("data.db")
         cursor = db.cursor()
+
+        self.tasksListWidget.clear()  # Отчистка списка задач
 
         # Делаем запрос и обрабатываем его
         query = "SELECT task, completed FROM tasks WHERE date = ?"
@@ -122,6 +123,8 @@ def except_hook(cls, exception, traceback):
 
 
 if __name__ == "__main__":
+    if not os.path.isfile("data.db"):
+        os.system(f"msg * Не найдена БД! Скачайте её отсюда: https://github.com/vokintru/YandexProject1")
     app = QApplication(sys.argv)
     window = Window()
     sys.excepthook = except_hook
